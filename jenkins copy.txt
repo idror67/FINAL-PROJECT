@@ -102,12 +102,6 @@ resource "aws_security_group" "jenkins_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # ingress {
-  #   from_port   = 443
-  #   to_port     = 443
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"] # Allow access to AWS APIs
-  # }
 
   egress {
     from_port   = 0
@@ -175,38 +169,29 @@ resource "aws_instance" "jenkins_ec2" {
   EOF
 }
 
-# resource "null_resource" "jenkins_initial_password" {
-#   provisioner "local-exec" {
-#     command = <<EOT
-#     echo "#!/bin/bash
-#     retries=12
-#     while [ ! -f /var/lib/jenkins/secrets/initialAdminPassword ]; do
-#       echo 'Waiting for initialAdminPassword file...'
-#       retries=$((retries - 1))
-#       if [ $retries -le 0 ]; then
-#         echo 'InitialAdminPassword file not found after several attempts.'
-#         exit 1
-#       fi
-#       sleep 10
-#     done
-#     sudo cat /var/lib/jenkins/secrets/initialAdminPassword > ./jenkins_initial_password.txt
-#     echo 'InitialAdminPassword file found and saved to jenkins_initial_password.txt'
-#     " > get_initial_password.sh
-#     chmod +x get_initial_password.sh
-#     ./get_initial_password.sh
-#     EOT
-#   }
-# }
+resource "null_resource" "jenkins_initial_password" {
+  provisioner "local-exec" {
+    command = <<EOT
+    echo "#!/bin/bash
+    retries=12
+    while [ ! -f /var/lib/jenkins/secrets/initialAdminPassword ]; do
+      echo 'Waiting for initialAdminPassword file...'
+      retries=$((retries - 1))
+      if [ $retries -le 0 ]; then
+        echo 'InitialAdminPassword file not found after several attempts.'
+        exit 1
+      fi
+      sleep 10
+    done
+    sudo cat /var/lib/jenkins/secrets/initialAdminPassword > ./jenkins_initial_password.txt
+    echo 'InitialAdminPassword file found and saved to jenkins_initial_password.txt'
+    " > get_initial_password.sh
+    chmod +x get_initial_password.sh
+    ./get_initial_password.sh
+    EOT
+  }
+}
 
-# resource "aws_security_group_rule" "eks_allow_jenkins" {
-#   type                     = "ingress"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "tcp"
-#   security_group_id        = module.eks.cluster_security_group_id
-#   source_security_group_id = aws_security_group.jenkins_sg.id
-#   description              = "Allow Jenkins EC2 instance to access EKS API server"
-# }
 
 
 
