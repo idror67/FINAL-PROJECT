@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret')
+        AWS_DEFAULT_REGION = 'us-east-1'  // שנה את האזור בהתאם ל-EKS שלך
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/idror67/FINAL-PROJECT.git'
+            }
+        }
+
+        stage('Configure AWS CLI') {
+            steps {
+                script {
+                    sh '''
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set region $AWS_DEFAULT_REGION
+                    '''
+                }
+            }
+        }
+
+        stage('Update Kubeconfig') {
+            steps {
+                script {
+                    sh '''
+                    aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name my-terra-cluster
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    dir('flaskcontactapp') {
+                        sh 'kubectl get nodes'  
+                        sh 'kubectl apply -f mysql.yaml'
+                        sh 'kubectl apply -f flask-app.yaml'
+                        sh 'kubectl get all'
+                    }
+                }
+            }
+        }
+    }
+}

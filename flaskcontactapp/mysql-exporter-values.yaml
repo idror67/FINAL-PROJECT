@@ -1,0 +1,11 @@
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    release: prometheus
+  
+ 
+
+mysql:
+  host: "mysql-service"
+  pass: "admin"
+  user: "root"

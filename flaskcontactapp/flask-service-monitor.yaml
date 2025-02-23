@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: prometheus
+    app: flask-contacts-app
+  name: flask-service-monitor
+spec:
+  endpoints:
+  - interval: 30s
+    port: flask-contacts-service
+    scrapeTimeout: 10s
+  selector:
+    matchLabels:
+      app: flask-contacts-service
