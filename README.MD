@@ -21,7 +21,7 @@ This project sets up a CI/CD pipeline in AWS using Terraform, Jenkins, and Kuber
 
 - **STEP4: Flask Contacts App Deployment** (Directory: `FLASKCONTACTAPP`)
   - Deploy the Flask contacts application to EKS.
-  - Ensure the service is accessible on port 5053.
+  - Ensure the service is accessible on port 5000.
   - Includes optional monitoring setup with Prometheus.
 
 ## Bonus: Monitoring with Prometheus
